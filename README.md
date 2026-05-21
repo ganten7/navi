@@ -8,13 +8,19 @@ Written in Rust on top of [egui](https://github.com/emilk/egui) + [glow](https:/
 
 ## Status
 
-- **macOS** — primary target, fully supported. Tested on Apple Silicon (M-series) at 60 / 120 / 240 Hz.
+- **macOS** — primary target, fully supported. Tested on Apple Silicon (M-series) at 60 / 120 / 240 Hz. A pre-built `Navi.app` ships with each release.
 - **Linux** — builds cleanly; the macOS-only `CADisplayLink` pacer is gated, so a small amount of glue (using `SwapInterval::Wait(1)` or Wayland presentation-time / DRM vblank) is required before it renders. Everything else (egui, winit, glutin, sqlite, emacsclient discovery) is cross-platform.
 - **Windows** — not supported. The `emacsclient` socket discovery is Unix-only and the macOS pacer would have to be replaced by DXGI waitable swap chains.
 
 ---
 
 ## Quick start
+
+### Pre-built macOS app (Apple Silicon)
+
+Download `Navi-<version>-host.zip` from the [Releases](https://github.com/ganten7/navi/releases) page, unzip, and double-click `Navi.app`. The bundle is ad-hoc signed; on first launch macOS Gatekeeper may flag it — right-click → Open, or run `xattr -cr Navi.app` to clear the quarantine flag.
+
+### From source
 
 ```bash
 git clone https://github.com/ganten7/navi.git
@@ -23,13 +29,21 @@ cargo build --release
 ./target/release/navi
 ```
 
+To build the `.app` bundle yourself:
+
+```bash
+./scripts/build-macos.sh                # arm64 (host)
+ARCH=universal ./scripts/build-macos.sh # arm64 + x86_64 universal
+open dist/Navi.app
+```
+
 On first run, Navi auto-detects your `org-roam.db` and creates `~/.config/navi/config.json`. Subsequent launches start in well under a second.
 
 ---
 
 ## Requirements
 
-- **Rust 1.75+** (stable) — install via [rustup](https://rustup.rs/)
+- **Rust 1.75+** (stable) — install via [rustup](https://rustup.rs/) (source builds only)
 - **org-roam v2** database (`nodes`, `files`, `links`, `tags`, `aliases`)
 - **emacsclient** + a running Emacs server (`(server-start)` in your init) — for double-click-to-open
 - A working OpenGL 3.3 context — built into macOS / standard on Linux
@@ -156,6 +170,8 @@ navi/                     Binary: UI, rendering, event loop
   src/painter.rs          GraphPainter — grid, edges, nodes, labels
   src/macos_display.rs    macOS CADisplayLink + tier control
   src/theme.rs            Colour themes
+scripts/build-macos.sh    Cargo build + Navi.app + zip for release
+assets/icon.icns          App bundle icon
 ```
 
 ---
@@ -163,11 +179,14 @@ navi/                     Binary: UI, rendering, event loop
 ## Building
 
 ```bash
-# Release (recommended)
+# Release (recommended for use)
 cargo build --release
 
 # Dev (slower at runtime, faster compile, includes debuginfo)
 cargo build
+
+# macOS .app bundle + release zip
+./scripts/build-macos.sh
 ```
 
 The release profile in the workspace has `lto = true` and `opt-level = 3`. Expect a 30–60 s clean release build on a modern laptop.
