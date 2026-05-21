@@ -1,0 +1,27 @@
+[package]
+name = "navi"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+navi-core = { path = "../navi-core" }
+egui = { version = "0.29", features = ["default_fonts", "bytemuck"] }
+egui_extras = { version = "0.29", features = ["image"] }
+egui-winit = { version = "0.29", default-features = false, features = ["clipboard", "links"] }
+egui_glow = { version = "0.29", default-features = false, features = ["winit"] }
+glow = "0.14"
+glutin = "0.32"
+glutin-winit = "0.5"
+winit = { version = "0.30", default-features = false, features = ["rwh_06"] }
+raw-window-handle = "0.6"
+regex = "1"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6"
+objc2-foundation = { version = "0.3", features = ["NSRunLoop", "NSString", "NSObjCRuntime", "NSThread", "NSDate"] }
+objc2-app-kit = { version = "0.3", features = ["NSView", "NSWindow", "NSScreen"] }
+objc2-quartz-core = { version = "0.3", features = ["CADisplayLink", "CAFrameRateRange"] }
+
+[profile.release]
+opt-level = 3
+lto = true

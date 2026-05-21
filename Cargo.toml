@@ -1,0 +1,3 @@
+[workspace]
+members = ["navi-core", "navi"]
+resolver = "2"
